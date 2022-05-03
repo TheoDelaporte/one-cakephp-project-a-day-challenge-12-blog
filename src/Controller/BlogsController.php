@@ -29,15 +29,16 @@ class BlogsController extends AppController
     /**
      * View method
      *
-     * @param string|null $id Blog id.
+     * @param string|null $slug Blog slug.
      * @return \Cake\Http\Response|null|void Renders view
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function view($id = null)
+    public function view($slug = null)
     {
-        $blog = $this->Blogs->get($id, [
+        $blog = $this->Blogs->find('slugged', [
             'contain' => ['Tags'],
-        ]);
+            'slug' => $slug,
+        ])->firstOrFail();
 
         $this->set(compact('blog'));
     }

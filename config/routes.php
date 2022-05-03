@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Routes configuration.
  *
@@ -56,7 +57,14 @@ return static function (RouteBuilder $routes) {
          * ...and connect the rest of 'Pages' controller's URLs.
          */
         $builder->connect('/pages/*', 'Pages::display');
-
+        $builder->connect('/view/{slug}', [
+            'controller' => 'Blogs',
+            'action' => 'view',
+        ])
+            ->setPass(['slug'])
+            ->setPatterns([
+                'slug' => '[a-z0-9-_]+',
+            ]);
         /*
          * Connect catchall routes for all controllers.
          *
