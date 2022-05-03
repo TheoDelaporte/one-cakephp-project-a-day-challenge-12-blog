@@ -37,7 +37,16 @@ $this->Html->css(['styles.css'], ['block' => true,])
                     <div class="text-muted fst-italic mb-2">Posted on <?= $blog->created->format('M d, Y') ?></div>
                     <!-- Post categories-->
                     <?php foreach ($blog->tags as $tag) : ?>
-                        <a class="badge bg-secondary text-decoration-none link-light" href="#!"><?= h($tag->name) ?></a>
+                        <?= $this->Html->link(
+                            $tag->name,
+                            [
+                                'action' => 'index',
+                                'tag_slug' => $tag->slug,
+                            ],
+                            [
+                                'class' => 'badge bg-secondary text-decoration-none link-light',
+                            ]
+                        ) ?>
                     <?php endforeach; ?>
                 </header>
                 <!-- Preview image figure-->

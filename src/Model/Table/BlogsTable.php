@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Model\Table;
@@ -91,5 +92,37 @@ class BlogsTable extends Table
             ->notEmptyString('content');
 
         return $validator;
+    }
+
+    /**
+     * Find published blogs
+     *
+     * @param Query $query
+     * @return Query
+     */
+    public function findPublished(Query $query)
+    {
+        return $query->where(['published' => true]);
+    }
+
+    /**
+     * @param Query $query
+     * @param array $options
+     */
+    public function findIndex(Query $query, $options)
+    {
+        $query = $query->find('published')
+            ->contain(['Tags']);
+
+        $tagSlug = $options['tagSlug'] ?? null;
+        if (!$tagSlug) {
+            return $query;
+        }
+
+        return $query->matching('Tags', function (Query $tagQuery) use ($tagSlug) {
+            return $tagQuery->find('slugged', [
+                'slug' => $tagSlug
+            ]);
+        });
     }
 }

@@ -39,7 +39,16 @@ $this->Html->css(['styles.css'], ['block' => true,])
                 <div class="card mb-2">
                     <div class="card-body">
                         <?php foreach ($blog->tags as $tag) : ?>
-                            <a class="badge bg-secondary text-decoration-none link-light" href="#!"><?= h($tag->name) ?></a>
+                            <?= $this->Html->link(
+                                $tag->name,
+                                [
+                                    'action' => 'index',
+                                    'tag_slug' => $tag->slug,
+                                ],
+                                [
+                                    'class' => 'badge bg-secondary text-decoration-none link-light',
+                                ]
+                            ) ?>
                         <?php endforeach; ?>
                         <h4 class="card-title mt-2"><?= h($blog->title) ?></h4>
                         <p class="card-text"><?= h($blog->summary) ?></p>
