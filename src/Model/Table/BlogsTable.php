@@ -29,6 +29,7 @@ use Cake\Validation\Validator;
  * @method \App\Model\Entity\Blog[]|\Cake\Datasource\ResultSetInterface deleteManyOrFail(iterable $entities, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
+ * @mixin \Search\Model\Behavior\SearchBehavior
  */
 class BlogsTable extends Table
 {
@@ -41,18 +42,30 @@ class BlogsTable extends Table
     public function initialize(array $config): void
     {
         parent::initialize($config);
-
         $this->setTable('blogs');
         $this->setDisplayField('title');
         $this->setPrimaryKey('id');
-
         $this->addBehavior('Timestamp');
-
         $this->belongsToMany('Tags', [
             'foreignKey' => 'blog_id',
             'targetForeignKey' => 'tag_id',
             'joinTable' => 'blogs_tags',
         ]);
+        $this->addBehavior('Muffin/Slug.Slug', [
+            'onUpdate' => true,
+        ]);
+
+        $this->addBehavior('Search.Search');
+        $this->searchManager()
+            ->add('q', 'Search.Like', [
+                'before' => true,
+                'after' => true,
+                'fieldMode' => 'OR',
+                'comparison' => 'LIKE',
+                'wildcardAny' => '*',
+                'wildcardOne' => '?',
+                'fields' => ['title', 'summary', 'content'],
+            ]);
     }
 
     /**
@@ -64,36 +77,32 @@ class BlogsTable extends Table
     public function validationDefault(Validator $validator): Validator
     {
         $validator
+            ->integer('id')
+            ->allowEmptyString('id', null, 'create');
+        $validator
             ->scalar('title')
             ->maxLength('title', 255)
             ->requirePresence('title', 'create')
             ->notEmptyString('title');
-
         $validator
             ->scalar('slug')
             ->maxLength('slug', 255)
-            ->requirePresence('slug', 'create')
             ->notEmptyString('slug');
-
         $validator
             ->scalar('summary')
             ->maxLength('summary', 255)
             ->requirePresence('summary', 'create')
             ->notEmptyString('summary');
-
         $validator
             ->boolean('published')
             ->requirePresence('published', 'create')
             ->notEmptyString('published');
-
         $validator
             ->scalar('content')
             ->requirePresence('content', 'create')
             ->notEmptyString('content');
-
         return $validator;
     }
-
     /**
      * Find published blogs
      *
@@ -104,21 +113,23 @@ class BlogsTable extends Table
     {
         return $query->where(['published' => true]);
     }
-
     /**
      * @param Query $query
      * @param array $options
      */
     public function findIndex(Query $query, $options)
     {
-        $query = $query->find('published')
+        $query = $query
+            ->find('published')
+            ->find('search', [
+                'search' => $options['search'],
+            ])
             ->contain(['Tags']);
 
         $tagSlug = $options['tagSlug'] ?? null;
         if (!$tagSlug) {
             return $query;
         }
-
         return $query->matching('Tags', function (Query $tagQuery) use ($tagSlug) {
             return $tagQuery->find('slugged', [
                 'slug' => $tagSlug
