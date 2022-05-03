@@ -13,7 +13,13 @@
                 <div class="col-sm-6">
                     <ul class="list-unstyled mb-0">
                         <?php foreach ($tagList as $tag) : ?>
-                            <li><a href="#!"><?= h($tag->name) ?></a></li>
+                            <li><?= $this->Html->link(
+                                    $tag->name,
+                                    [
+                                        'action' => 'index',
+                                        'tag_slug' => $tag->slug,
+                                    ]
+                                ) ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
