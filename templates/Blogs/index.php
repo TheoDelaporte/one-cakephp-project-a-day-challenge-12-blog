@@ -35,6 +35,15 @@ $this->Html->css(['styles.css'], ['block' => true,])
                     <h1 class="fw-bolder mb-1"><?= __('The Awesome Blog') ?></h1>
                 </header>
             </article>
+            <?php if (!$blogs) : ?>
+                <div class="alert alert-info">
+                    <strong><?= __('Not found blog entries') ?></strong>
+                    <?= $this->Html->link(
+                        __('Got to Home to list all'),
+                        ['action' => 'index']
+                    ) ?>
+                </div>
+            <?php endif; ?>
             <?php foreach ($blogs as $blog) : ?>
                 <div class="card mb-2">
                     <div class="card-body">
