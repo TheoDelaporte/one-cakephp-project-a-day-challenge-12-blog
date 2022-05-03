@@ -41,9 +41,14 @@ $this->Html->css(['styles.css'], ['block' => true,])
                         <?php foreach ($blog->tags as $tag) : ?>
                             <a class="badge bg-secondary text-decoration-none link-light" href="#!"><?= h($tag->name) ?></a>
                         <?php endforeach; ?>
-                        <h5 class="card-title mt-2"><?= h($blog->title) ?></h5>
+                        <h4 class="card-title mt-2"><?= h($blog->title) ?></h4>
                         <p class="card-text"><?= h($blog->summary) ?></p>
                         <p class="card-text"><small class="text-muted">Posted on <?= $blog->created->format('M d, Y') ?></small></p>
+                        <?= $this->Html->link(
+                            __('Read more →'),
+                            ['action' => 'view', $blog->slug],
+                            ['class' => 'btn btn-secondary']
+                        ) ?>
                     </div>
                 </div>
             <?php endforeach; ?>
