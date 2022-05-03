@@ -24,7 +24,7 @@ class BlogsController extends AppController
         $query = $this->Blogs->find('index', [
             'tagSlug' => $this->request->getParam('tag_slug'),
         ]);
-        $blogs = $this->paginate($query);
+        $blogs = $this->paginate($query)->toArray();
 
         $this->set(compact('blogs'));
     }
